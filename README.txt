@@ -1,4 +1,4 @@
-=== WP Media Search ===
+=== Media Search Plus ===
 
 Contributors: PhilLehmann
 Tags: media library, media, attachment
@@ -8,7 +8,7 @@ Stable tag: 0.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Search through all fields in Media Library.
+Search through all fields in Media Library to actually find something.
 
 == Description ==
 
@@ -17,14 +17,14 @@ This plugin is made for:
 * Search through all fields in Media Library, including: ID, title, caption, alternative text and description.
 * Search Taxonomies for Media, include the name, slug and description fields.
 * Search media file name.
-* Use shortcode `[mse-search-form]` to insert a media search form in posts and template files. It will search for media by all fields mentioned above.
+* Use shortcode `[msp-search-form]` to insert a media search form in posts and template files. It will search for media by all fields mentioned above.
 
 == Installation ==
 
 = Using The WordPress Dashboard =
 
 1. Navigate to the 'Add New' in the plugins dashboard
-2. Search for 'wp-media-search'
+2. Search for 'media-search-plus'
 3. Click 'Install Now'
 4. Activate the plugin on the Plugin dashboard
 
@@ -32,13 +32,13 @@ This plugin is made for:
 
 1. Navigate to the 'Add New' in the plugins dashboard
 2. Navigate to the 'Upload' area
-3. Select `wp-media-search.zip` from your computer
+3. Select `media-search-plus.zip` from your computer
 4. Click 'Install Now'
 5. Activate the plugin in the Plugin dashboard
 
 = Using FTP =
 
-1. Download `wp-media-search.zip`
+1. Download `media-search-plus.zip`
 2. Extract the `media-search` directory to your computer
 3. Upload the `media-search` directory to the `/wp-content/plugins/` directory
 4. Activate the plugin in the Plugin dashboard
@@ -55,7 +55,7 @@ Please add the following code to the `functions.php` in your theme:
 
 		return $url;
 	}
-	add_filter( 'mse_get_attachment_url', 'my_get_attachment_url', 10, 2 );
+	add_filter( 'msp_get_attachment_url', 'my_get_attachment_url', 10, 2 );
 
 == Screenshots ==
 
@@ -67,6 +67,9 @@ Please add the following code to the `functions.php` in your theme:
 = 0.8.2 =
 * Forked by PhilLehmann (original author so far 1fixdotio - http://1fix.io)
 * Made compatible with WordPress 6.1
+* Renamed shortcode `[mse-search-form]` to `[msp-search-form]`
+* Renamed filter `mse_get_attachment_url` to `msp_get_attachment_url`
+* Removed clutter in the code
 
 = 0.8.1 =
 * Fix PHP notices and updated the "Tested up to" field.
