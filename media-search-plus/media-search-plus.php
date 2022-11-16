@@ -94,13 +94,16 @@ class Media_Search_Plus {
 	public static function posts_clauses($pieces) {
 		global $wp_query, $wpdb;
 
+		$requestQuery = isset($_REQUEST['query']) ? sanitize_text_field($_REQUEST['query']) : null;
+		$requestAction = isset($_REQUEST['action']) ? sanitize_text_field($_REQUEST['action']) : null;
+
 		$vars = $wp_query->query_vars;
 		if(empty($vars)) {
-			$vars = (isset($_REQUEST['query'])) ? $_REQUEST['query'] : array();
+			$vars = $requestQuery == null ? array() : $requestQuery;
 		}
 
 		// Rewrite the where clause
-		if(!empty($vars['s']) && ((isset( $_REQUEST['action']) && 'query-attachments' == $_REQUEST['action']) || 'attachment' == $vars['post_type'])) {
+		if(!empty($vars['s']) && (($requestAction == 'query-attachments') || $vars['post_type'] == 'attachment')) {
 			$pieces['where'] = " AND $wpdb->posts.post_type = 'attachment' AND ($wpdb->posts.post_status = 'inherit' OR $wpdb->posts.post_status = 'private')";
 
 			if(class_exists('WPML_Media')) {
@@ -110,8 +113,8 @@ class Media_Search_Plus {
 				$pieces['where'] .= $wpdb->prepare(" AND t.element_type='post_attachment' AND t.language_code = %s", $lang);
 			}
 
-			if(!empty( $vars['post_parent'])) {
-				$pieces['where'] .= " AND $wpdb->posts.post_parent = " . $vars['post_parent'];
+			if(!empty($vars['post_parent'])) {
+				$pieces['where'] .= $wpdb->prepare(" AND $wpdb->posts.post_parent = %d", $vars['post_parent']);
 			} elseif(isset($vars['post_parent']) && 0 === $vars['post_parent']) {
 				// Get unattached attachments
 				$pieces['where'] .= " AND $wpdb->posts.post_parent = 0";
@@ -183,15 +186,16 @@ class Media_Search_Plus {
 	public function search_form($form = '') {
 
 		$domain = $this->plugin_slug;
-		$s = get_query_var('s');
+		$s = sanitize_text_field(get_query_var('s'));
 
-		$placeholder = (empty($s)) ? apply_filters('msp_search_form_placeholder', __( 'Search Media...', $domain ) ) : $s;
+		$placeholder = (empty($s)) ? apply_filters('msp_search_form_placeholder', 'Search Media...') : $s;
 
-		if(empty($form))
+		if(empty($form)) {
 			$form = get_search_form(false);
+		}
 
-		$form = preg_replace("/(form.*class=\")(.\S*)\"/", '$1$2 ' . apply_filters( 'msp_search_form_class', 'msp-search-form' ) . '"', $form);
-		$form = preg_replace("/placeholder=\"(.\S)*\"/", 'placeholder="' . $placeholder . '"', $form);
+		$form = preg_replace("/(form.*class=\")(.\S*)\"/", '$1$2 ' . apply_filters('msp_search_form_class', 'msp-search-form') . '"', $form);
+		$form = preg_replace("/placeholder=\"(.\S)*\"/", 'placeholder="' . esc_attr($placeholder) . '"', $form);
 		$form = str_replace('</form>', '<input type="hidden" name="post_type" value="attachment" /></form>', $form);
 
 		$result = apply_filters('msp_search_form', $form);
@@ -210,13 +214,13 @@ class Media_Search_Plus {
 	public function get_the_image($excerpt) {
 		global $post;
 
-		if(!is_admin() && is_search() && 'attachment' == $post->post_type) {
+		if(!is_admin() && is_search() && $post->post_type == 'attachment') {
 			$params = array(
 				'attachment_id' => $post->ID,
 				'size' => 'thumbnail',
 				'icon' => false,
 				'attr' => array()
-				);
+			);
 			$params = apply_filters('msp_get_attachment_image_params', $params);
 			extract($params);
 
@@ -272,7 +276,7 @@ class Media_Search_Plus {
 	 */
 	public function search_form_on_search($form) {
 
-		if (is_search() && is_main_query() && isset($_GET['post_type']) && 'attachment' == $_GET['post_type']) {
+		if (is_search() && is_main_query() && isset($_GET['post_type']) && $_GET['post_type'] == 'attachment') {
 			$form = $this->search_form($form);
 		}
 
